@@ -9,8 +9,6 @@ script: go test -v .
 
 services:
   - mysql
-
-services:
   - redis-server
 
 before_install:
