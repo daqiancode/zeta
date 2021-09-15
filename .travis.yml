@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.x
+
+go_import_path: github.com/daqiancode/zeta
+
+script: go test -v .
+
+services:
+  - mysql
+
+services:
+  - redis-server
+
+before_install:
+  - mysql -e 'CREATE DATABASE zeta;'
