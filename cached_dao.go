@@ -196,7 +196,7 @@ func (s *CachedDAO) GetByWithMap(valueRef interface{}, indexes map[string]interf
 		return
 	}
 	// miss
-	s.TableDAO.GetBy(valueRef, indexes)
+	s.TableDAO.GetByWithMap(valueRef, indexes)
 	id = s.GetIDValue(valueRef)
 	if id == 0 {
 		return
