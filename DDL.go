@@ -57,7 +57,7 @@ func (s *DDL) AddForeignKey(table, fkey, target, targetCol string, onDelete, onU
 	fkName := s.MakeFKName(table, fkey, target, targetCol)
 
 	ddl := fmt.Sprintf("ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s) ON UPDATE %s ON DELETE %s", table, fkName, fkey, target, targetCol, onUpdate, onDelete)
-	fmt.Println(ddl)
+	// fmt.Println(ddl)
 	tx := s.db.Exec(ddl)
 	fmt.Println(tx.Error)
 }
@@ -120,7 +120,7 @@ func (s *DDL) GetSchemaByStructName(structName string) *schema.Schema {
 	return r
 }
 func (s *DDL) GetSchema(obj interface{}) *schema.Schema {
-	r, _ := s.cacheStore.Load(reflect.TypeOf(obj))
+	r, _ := s.cacheStore.Load(reflect.Indirect(reflect.ValueOf(obj)).Type())
 	return r.(*schema.Schema)
 }
 
