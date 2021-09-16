@@ -2,16 +2,21 @@ package zeta
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
 
 type BaseDAO struct {
-	DB *gorm.DB
+	DB            *gorm.DB
+	TableMaxIdSql string
 }
 
 func NewBaseDAO(db *gorm.DB) *BaseDAO {
-	return &BaseDAO{DB: db}
+	return &BaseDAO{
+		DB:            db,
+		TableMaxIdSql: "select ifnull(max(`%s`),0) as r from `%s`",
+	}
 }
 func (s *BaseDAO) HandleError(err error) {
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -20,17 +25,14 @@ func (s *BaseDAO) HandleError(err error) {
 }
 
 func (s *BaseDAO) GetMaxID(dbTableName string, dbIdField ...string) uint64 {
-	type Result struct {
-		R uint64
-	}
-	r := Result{}
-	idField := "id"
+	var r uint64
+	idField := "ID"
 	if len(dbIdField) > 0 {
 		idField = dbIdField[0]
 	}
-	tx := s.DB.Raw("select max(" + idField + ") as r from " + dbTableName).Scan(&r)
+	tx := s.DB.Raw(fmt.Sprintf(s.TableMaxIdSql, idField, dbTableName)).Scan(&r)
 	s.HandleError(tx.Error)
-	return r.R
+	return r
 }
 
 func (s *BaseDAO) Count(sql string, values ...interface{}) uint64 {
@@ -115,4 +117,12 @@ func (s *BaseDAO) Delete(resultRef interface{}, id uint64) {
 func (s *BaseDAO) DeleteMany(valueRef interface{}, ids []uint64) {
 	tx := s.DB.Delete(valueRef, ids)
 	s.HandleError(tx.Error)
+}
+
+func (s *BaseDAO) GetDBFieldName(structFieldName string) string {
+	return s.DB.NamingStrategy.ColumnName("", structFieldName)
+}
+
+func (s *BaseDAO) GetDBTableName(table string) string {
+	return s.DB.NamingStrategy.TableName(table string)
 }
