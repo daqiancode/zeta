@@ -1,6 +1,7 @@
 package zeta
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -125,4 +126,15 @@ func (s *BaseDAO) GetDBFieldName(structFieldName string) string {
 
 func (s *BaseDAO) GetDBTableName(table string) string {
 	return s.DB.NamingStrategy.TableName(table)
+}
+
+func (s *BaseDAO) Transaction(fn func(db *BaseDAO) error, opts ...*sql.TxOptions) error {
+	return s.DB.Transaction(func(tx *gorm.DB) error {
+		return fn(NewBaseDAO(tx))
+	}, opts...)
+}
+
+func (s *BaseDAO) Begin(opts ...*sql.TxOptions) *BaseDAO {
+	tx := s.DB.Begin(opts...)
+	return NewBaseDAO(tx)
 }

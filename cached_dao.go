@@ -229,7 +229,7 @@ func (s *CachedDAO) ClearCacheForTable() {
 }
 
 func (s *CachedDAO) ClearCacheWithPrefix(prefix string) {
-	err := s.Redis.Eval(s.RedisisCtx, "return redis.call('del', unpack(redis.call('keys', KEYS[1])))", []string{s.Prefix + "/" + prefix + "*"}).Err()
+	err := s.Redis.Eval(s.RedisisCtx, "return redis.call('del',unpack({'',unpack(redis.call('keys', KEYS[1]))}))", []string{s.Prefix + "/" + prefix + "*"}).Err()
 	s.HandleError(err)
 }
 
