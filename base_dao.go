@@ -124,5 +124,5 @@ func (s *BaseDAO) GetDBFieldName(structFieldName string) string {
 }
 
 func (s *BaseDAO) GetDBTableName(table string) string {
-	return s.DB.NamingStrategy.TableName(table string)
+	return s.DB.NamingStrategy.TableName(table)
 }
