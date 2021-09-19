@@ -2,14 +2,21 @@ language: go
 
 go:
   - 1.x
+  - tip
 
 go_import_path: github.com/daqiancode/zeta
 
-script: go test -v .
+script: 
+  - go test -v .
+  - go test -race -coverprofile=coverage.txt -covermode=atomic
 
 services:
   - mysql
   - redis-server
 
 before_install:
+  - go get -t -v ./...
   - mysql -e 'CREATE DATABASE zeta;'
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
