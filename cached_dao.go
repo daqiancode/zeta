@@ -322,7 +322,7 @@ func (s *CachedDAO) InsertMany(valuesRef interface{}) {
 	s.ClearCache(objs...)
 }
 func (s *CachedDAO) Delete(id uint64) {
-	var old map[string]interface{}
+	old := make(map[string]interface{})
 	tx := s.DB.Model(s.Model).Take(&old, id)
 	s.HandleError(tx.Error)
 	s.TableDAO.Delete(id)
