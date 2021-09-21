@@ -165,12 +165,12 @@ func (s *CachedDAO) CacheGet(key string, valueRef interface{}) bool {
 	return false
 }
 
-func (s *CachedDAO) CacheGetUint64(key string) uint64 {
+func (s *CachedDAO) CacheGetUint64(key string) (uint64, bool) {
 	var r uint64
 	if s.CacheGet(key, &r) {
-		return r
+		return r, true
 	}
-	return 0
+	return 0, false
 }
 
 // return []string
@@ -190,17 +190,17 @@ func (s *CachedDAO) GetBy(valueRef interface{}, indexes ...interface{}) {
 // redis key eg. projectusers/pid/2/uid/1 -> id
 func (s *CachedDAO) GetByWithMap(valueRef interface{}, indexes map[string]interface{}) {
 	key := s.MakeKeyByMap(indexes)
-	id := s.CacheGetUint64(key)
-	if id > 0 { // hit
+	if id, ok := s.CacheGetUint64(key); ok { //hit
+		if id == 0 {
+			return
+		}
 		s.Get(valueRef, id)
 		return
 	}
+
 	// miss
 	s.TableDAO.GetByWithMap(valueRef, indexes)
-	id = s.GetIDValue(valueRef)
-	if id == 0 {
-		return
-	}
+	id := s.GetIDValue(valueRef)
 	s.CacheSet(key, id)
 }
 
