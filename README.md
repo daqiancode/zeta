@@ -7,6 +7,12 @@ integrate gorm and redis
 go get https://github.com/daqiancode/zeta
 ```
 
+## Cached DAO Step:
+1. Define models and migrate
+2. Define NewCachedDAO
+3. Add `Indexes` for each table's NewCachedDAO. Clearing cache action will use those indexes. Indexes must cover `GetBy` and `ListBy` fields
+4. `ClearCache` manually after transaction or using `non-NewCachedDAO` updating methods
+
 ## Examples:
 - Define models
 ```go 
