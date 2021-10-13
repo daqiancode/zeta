@@ -4,7 +4,7 @@ integrate gorm and redis
 
 ## Installation
 ```shell
-go get https://github.com/daqiancode/zeta
+go get github.com/daqiancode/zeta
 ```
 
 ## Cached DAO Step:
