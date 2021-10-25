@@ -175,6 +175,9 @@ func (s *CachedDAO) CacheGetUint64(key string) (uint64, bool) {
 
 // return []string
 func (s *CachedDAO) GetCacheMany(keys []string) []interface{} {
+	if len(keys) == 0 {
+		return nil
+	}
 	// var r map[string][]byte
 	rs, err := s.Redis.MGet(s.RedisisCtx, keys...).Result()
 	s.HandleError(err)
