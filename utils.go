@@ -1,6 +1,8 @@
 package zeta
 
-import "strings"
+import (
+	"strings"
+)
 
 func hasNil(vs []interface{}) bool {
 	for _, v := range vs {
