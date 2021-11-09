@@ -1,6 +1,7 @@
 package zeta
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -82,6 +83,7 @@ func (s *DDL) AddFKs(table interface{}) {
 	}
 
 }
+
 func (s *DDL) MakeFKs() {
 	s.Range(func(structType reflect.Type, src *schema.Schema) bool {
 		for _, f := range src.Fields {
@@ -89,14 +91,19 @@ func (s *DDL) MakeFKs() {
 			if v, ok := f.TagSettings["FK"]; ok {
 				fkInfo := s.ParseFKInfo(v)
 				dst := s.GetSchemaByStructName(fkInfo.StructName)
+				if dst == nil {
+					info := fmt.Sprintf("Make FK error. %s.%s can not ref struct %s\n", src.Name, f.Name, fkInfo.StructName)
+					fmt.Println(info)
+					panic(errors.New(info))
 
+				}
 				if fkInfo.OnDelete == "" {
 					fkInfo.OnDelete = s.DefaultOnDelete
 				}
 				if fkInfo.OnUpdate == "" {
 					fkInfo.OnUpdate = s.DefaultOnUpdate
 				}
-
+				fmt.Printf("Make FK: %s.%s -> %s.%s on delete %s on update %s\n", src.Table, f.DBName, dst.Table, dst.PrimaryFieldDBNames[0], fkInfo.OnDelete, fkInfo.OnUpdate)
 				s.AddForeignKey(src.Table, f.DBName, dst.Table, dst.PrimaryFieldDBNames[0], fkInfo.OnDelete, fkInfo.OnUpdate)
 			}
 		}
